@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timetracker
+  namespace: timetracker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: timetracker
+  template:
+    metadata:
+      labels:
+        app: timetracker
+    spec:
+      containers:
+        - name: timetracker
+          image: ACCOUNT_ID.dkr.ecr.eu-west-3.amazonaws.com/timetracker:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: timetracker-config
+          env:
+            - name: SUPABASE_SERVICE_ROLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-secrets
+                  key: SUPABASE_SERVICE_ROLE_KEY
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
